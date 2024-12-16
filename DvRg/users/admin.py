@@ -11,18 +11,17 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ['username', 'full_name', 'status']
+    list_display = ['username', 'full_name']
 
     fieldsets = UserAdmin.fieldsets + (
-        ('Реквезиты 1С', {'fields': ('full_name', 'status', )}),
+        ('Реквезиты 1С', {'fields': ('full_name', )}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Реквезиты 1С', {'fields': ('full_name', 'status', )}),
+        ('Реквезиты 1С', {'fields': ('full_name', )}),
     )
 
     search_fields = ('username', 'username')
     ordering = ('full_name', 'username')
-    list_filter = ('status', )
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
