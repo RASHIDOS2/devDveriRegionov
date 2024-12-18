@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-
+from django.contrib.auth import get_user_model
 
 # Create your models here.
 
@@ -55,6 +55,18 @@ class Products(models.Model):
     class Meta:
         verbose_name = 'Номенклатура'
         verbose_name_plural = 'Номенклатуры'
+
+
+class Organizations(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(verbose_name="Наименование", max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Организация'
+        verbose_name_plural = 'Организации'
 
 
 def image_directory_path(instance, filename):
@@ -116,8 +128,8 @@ class CounterParty(models.Model):
 class Agreement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(verbose_name='Наименование', max_length=100)
-    number = models.Charfield(verbose_name='Номер', max_length=30)
-    date = models.DataField(verbose_name='Дата')
+    number = models.CharField(verbose_name='Номер', max_length=30)
+    date = models.DateField(verbose_name='Дата')
     partner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, null=True, blank=True, verbose_name='Партнер', related_name='partner_agreement', default=None)
     counterparty = models.ForeignKey(CounterParty, on_delete=models.PROTECT, verbose_name='Контрагент', null=True, blank=True, default=None, related_name='counterparty_agreement')
 
@@ -137,4 +149,4 @@ class Contract(models.Model):
     date = models.DateField(verbose_name='Дата')
     partner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, verbose_name='Партнер', default=None, related_name='partner_contract')
     counterparty = models.ForeignKey(CounterParty, on_delete=models.PROTECT, verbose_name='Контрагент', default=None, related_name='counterparty_contract')
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, verbose_name='Организация', default=None, related_name='organization_contract ')
+    organization = models.ForeignKey(Organizations, on_delete=models.PROTECT, verbose_name='Организация', default=None, related_name='organization_contract')

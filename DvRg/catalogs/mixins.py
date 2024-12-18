@@ -48,7 +48,7 @@ class RetrieveModelMixin:
         return my_response(serializer.data)
 
 
-class updateModelMixin:
+class UpdateModelMixin:
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -66,3 +66,19 @@ class updateModelMixin:
 
     def partial_update(self, request, *args, **kwargs):
         kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+
+class DestroyModelMixin:
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return my_response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class MyModelViewSet(ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAdminUser]

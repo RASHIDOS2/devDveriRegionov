@@ -1,49 +1,51 @@
 from rest_framework import viewsets, permissions
 from .serializers import *
 from .models import *
-# Create your views here.
+from .mixins import MyModelViewSet
 
 
-class ProductViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class ProductViewSet(MyModelViewSet):
     queryset = Products.objects.all()
     serializer_class = ProductsSerializer
 
 
-class ProductsGroupViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class ProductsGroupViewSet(MyModelViewSet):
     queryset = ProductGroup.objects.all()
     serializer_class = ProductsGroupSerializer
 
 
-class TypesOfProductsViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class TypesOfProductsViewSet(MyModelViewSet):
     queryset = TypesOfProducts.objects.all()
     serializer_class = TypesOfProductsSerializer
 
 
-class ImageViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class ImageViewSet(MyModelViewSet):
     queryset = Images.objects.all()
     serializer_class = ImagesSerializer
 
 
-class CharacteristicsViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class CharacteristicsViewSet(MyModelViewSet):
     queryset = Characteristics.objects.all()
     serializer_class = CharacteristicsSerializer
 
 
-class OrganizationViewSet(MyModelViewSet, viewsets.ModelViewSet):
-    queryset = Organization.objects.all()
+class OrganizationViewSet(MyModelViewSet):
+    queryset = Organizations.objects.all()
     serializer_class = OrganizationSerializer
 
 
-class CounterpartyViewSet(MyModelViewSet, viewsets.ModelViewSet):
-    queryset = Counterparty.objects.all()
-    serializer_class = CounterpartySerializer
+class CounterPartyViewSet(MyModelViewSet):
+    queryset = CounterParty.objects.all()
+    serializer_class = CounterPartySerializer
 
 
-class AgreementViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class AgreementViewSet(MyModelViewSet):
     queryset = Agreement.objects.all()
     serializer_class = AgreementSerializer
 
 
-class ContractViewSet(MyModelViewSet, viewsets.ModelViewSet):
+class ContractViewSet(MyModelViewSet):
     queryset = Contract.objects.all()
     serializer_class = ContractSerializer
+
+

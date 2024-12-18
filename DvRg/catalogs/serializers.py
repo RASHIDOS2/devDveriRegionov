@@ -20,6 +20,14 @@ class ProductsSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'group', 'use_characteristics', 'type_of_product']
 
 
+class CounterPartySerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(default=uuid.uuid4)
+
+    class Meta:
+        model = CounterParty
+        fields = ['id', 'partner', 'name', 'full_name', 'status', 'inn', 'kpp']
+
+
 class ProductsGroupSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4,)
 
@@ -35,6 +43,13 @@ class ImagesSerializer(serializers.ModelSerializer):
         model = Images
         fields = ['id', 'product', 'image']
 
+    def save(self, *args, **kwargs):
+        if self.instance:
+            if self.instance.image:
+                self.instance.image.delete()
+        return super().save(*args, **kwargs)
+
+
 
 class CharacteristicsSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4,)
@@ -48,7 +63,21 @@ class OrganizationSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4,)
 
     class Meta:
-        model = Organization
+        model = Organizations
         fields = ['id', 'name']
 
 
+class AgreementSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(default=uuid.uuid4)
+
+    class Meta:
+        model = Agreement
+        fields = ['id', 'name', 'number', 'date', 'partner', 'counterparty']
+
+
+class ContractSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(default=uuid.uuid4)
+
+    class Meta:
+        model = Contract
+        fields = ['id', 'name', 'number', 'date', 'partner', 'counterparty', 'organization', 'default']
