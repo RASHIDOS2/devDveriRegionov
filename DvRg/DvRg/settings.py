@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'catalogs.apps.CatalogsConfig',
     'price.apps.PriceConfig',
     'django_filters',
+    'documents.apps.DocumentsConfig',
 ]
 
 MIDDLEWARE = [
