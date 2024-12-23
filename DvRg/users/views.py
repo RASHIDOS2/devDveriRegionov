@@ -11,9 +11,10 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     permission_classes = [permissions.IsAdminUser]
 
+
 class ProfileCustomUserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProfileCustomUserSerializer
-    premission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user:

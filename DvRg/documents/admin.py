@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Orders, OrderDetails
+from .models import Orders, OrderDetails, ExchangeNode
 
 
 # Register your models here.
@@ -17,3 +17,4 @@ class OrdersAdmin(admin.ModelAdmin):
 
 admin.site.register(Orders, OrdersAdmin)
 admin.site.register(OrderDetails)
+admin.site.register(ExchangeNode)

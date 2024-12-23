@@ -14,14 +14,16 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['username', 'full_name']
 
     fieldsets = UserAdmin.fieldsets + (
-        ('Реквезиты 1С', {'fields': ('full_name', )}),
-    )
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Реквезиты 1С', {'fields': ('full_name', )}),
+        ('Реквизиты 1С', {'fields': ('full_name', )}),
     )
 
-    search_fields = ('username', 'username')
-    ordering = ('full_name', 'username')
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Реквизиты 1С', {'fields': ('full_name', )}),
+    )
+
+    search_fields = ('full_name', 'username',)
+    ordering = ('full_name', 'username',)
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
+

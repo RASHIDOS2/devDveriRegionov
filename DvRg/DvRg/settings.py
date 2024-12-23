@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'price.apps.PriceConfig',
     'django_filters',
     'documents.apps.DocumentsConfig',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -197,6 +198,8 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
+    'TOKEN_OBTAIN_SERIALIZER': 'users.serializers.TokenObtainLifetimeSerializer',
+    'TOKEN_REFRESH_SERIALIZER': 'users.serializers.TokenRefreshLifetimeSerializer'
 }
 
 
@@ -208,3 +211,9 @@ vars().update(EMAIL_CONFIG)
 # EMAIL_PORT = 465
 # EMAIL_USE_TLS = False
 # EMAIL_USE_SSL = True
+
+HTTP_SERVICE = env('HTTP_SERVICE')
+HTTP_USER = env('HTTP_USER')
+HTTP_PASSWORD = env('HTTP_PASSWORD')
+
+CELERY_BROKER_URL = 'amqp://ilya:1@127.0.0.1:5672'

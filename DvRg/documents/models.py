@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 from django.contrib.auth import get_user_model
 from catalogs.models import CounterParty, Organizations, Agreement, Contract, Products, Characteristics
-
+from datetime import datetime
 
 class Orders(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -33,6 +33,16 @@ class Orders(models.Model):
         verbose_name = 'Заказ клиента'
         verbose_name_plural = 'Заказы клиента'
 
+    def fix_exchange(self):
+        exchange = ExchangeNode.objects.filter(order=self)
+        if exchange:
+            exchange_obj = exchange.get()
+        else:
+            exchange_obj = ExchangeNode()
+        exchange_obj.order = self
+        exchange_obj.updated_at = datetime.today()
+        exchange_obj.save()
+
 
 class OrderDetails(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.PROTECT, verbose_name='Заказ клиента', default=None,
@@ -54,3 +64,15 @@ class OrderDetails(models.Model):
     class Meta:
         verbose_name = 'Заказ клиента (товары)'
         verbose_name_plural = 'Заказы клиента (товары)'
+
+
+class ExchangeNode(models.Model):
+    updated_at = models.DateTimeField(verbose_name='Дата и время изменения')
+    order = models.ForeignKey(Orders, on_delete=models.PROTECT, verbose_name='Заказ покупателя', default=None, related_name='order_exchange_node')
+
+    def __str__(self):
+        return f'Заказ клиента №{self.order.number} от {self.order.date} - {self.updated_at}'
+
+    class Meta:
+        verbose_name = "Измененный заказ"
+        verbose_name_plural = "Измененные заказы"
