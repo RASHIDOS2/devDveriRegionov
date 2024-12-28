@@ -34,7 +34,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class ProfileCustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['username', 'full_name']
+        fields = ('username', 'full_name')
 
 
 class TokenObtainLifetimeSerializer(TokenObtainPairSerializer):

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, exceptions
 from .serializers import CustomUserSerializer, ProfileCustomUserSerializer
+from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 # Create your views here
@@ -13,12 +14,11 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
 
 class ProfileCustomUserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = get_user_model().objects.all()
     serializer_class = ProfileCustomUserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        if self.request.user:
-            user = get_user_model().objects.filter(pk=self.request.user.pk)
-            if user is None:
-                raise exceptions.AuthenticationFailed('Пользователь не найден')
-            return user
+    def list(self, request, *args, **kwargs):
+        profile = self.get_queryset().get(pk=self.request.user.pk)
+        serializer = self.get_serializer(profile)
+        return Response({'user': serializer.data})
