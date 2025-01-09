@@ -81,3 +81,18 @@ class ContractSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contract
         fields = ['id', 'name', 'number', 'date', 'partner', 'counterparty', 'organization', 'default']
+
+
+class ProductsGroupTreeSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    parent = serializers.CharField()
+    title = serializers.CharField()
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, obj):
+        nodes = []
+        if len(obj.children) > 0:
+            for node in obj.children:
+                result = ProductsGroupTreeSerializer(node)
+                nodes.append(result.data)
+        return nodes

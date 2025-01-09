@@ -17,5 +17,5 @@ router.register(r'api/v1/contract', ContractViewSet, basename='contract')
 
 urlpatterns = [
     path('', include(router.urls)),
-
+    path('api/v1/group_tree/', ProductsGroupTree.as_view(), name='products_group_tree'),
 ]

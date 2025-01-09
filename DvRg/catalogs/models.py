@@ -22,6 +22,7 @@ class ProductGroup(models.Model):
 class UseCharacteristics(models.TextChoices):
     NOT_USE = 'NU', 'Не используются'
     GENERAL = 'GEN', 'Общие для вида номенклатуры'
+    OTHER = 'OTH', 'Общие с другим видом номенклатуры'
     INDIVIDUAL = 'IND', 'Индивидуальные для номенклатуры'
 
 
@@ -150,3 +151,5 @@ class Contract(models.Model):
     partner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, verbose_name='Партнер', default=None, related_name='partner_contract')
     counterparty = models.ForeignKey(CounterParty, on_delete=models.PROTECT, verbose_name='Контрагент', default=None, related_name='counterparty_contract')
     organization = models.ForeignKey(Organizations, on_delete=models.PROTECT, verbose_name='Организация', default=None, related_name='organization_contract')
+
+
