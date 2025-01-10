@@ -99,7 +99,7 @@ class Characteristics(models.Model):
                                         verbose_name='Вид номенклатуры', related_name='type_of_product_characteristics')
 
     def __str__(self):
-        return '{} {{}/{}}'.format(self.name, self.product, self.type_of_product)
+        return f'{self.name} {self.product}/{self.type_of_product}'
 
     class Meta:
         verbose_name = 'Характеристика номенклатуры'

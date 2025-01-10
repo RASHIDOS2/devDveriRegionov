@@ -53,7 +53,7 @@ class ContractViewSet(MyModelViewSet):
 
 
 class Node(object):
-    def __init__(self):
+    def __init__(self, node):
         self.id = node.id
         self.parent = node.parent
         self.title = node.title
@@ -69,14 +69,13 @@ def add_nodes(product_groups):
             if node.parent is not None:
                 if node.parent.id in tree_nodes.keys():
                     if node not in tree_nodes[node.parent.id].children :
-                        tree_nodes[node.parent.id].chidren.append(node)
+                        tree_nodes[node.parent.id].children.append(node)
     return tree_nodes
 
 
 class ProductsGroupTree(APIView):
-
     def get(self, request):
-        tree_nodes = add_nodes(ProductsGroup.objects.all())
+        tree_nodes = add_nodes(ProductGroup.objects.all())
         root_nodes = [node for id, node in tree_nodes.items() if (node.parent is None)]
 
         result = []
@@ -85,4 +84,5 @@ class ProductsGroupTree(APIView):
             result.append(group_sr.data)
 
         return Response({'results': result, 'errors': ''}, status=status.HTTP_200_OK)
+
 
