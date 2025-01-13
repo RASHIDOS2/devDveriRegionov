@@ -13,6 +13,8 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 class OrderSerializer(WritableNestedModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4,)
     order_orders_detail = OrderDetailSerializer(many=True, required=False)
+    partner_full_name = serializers.CharField(source='partner.full_name', read_only=True)
+    organization_name = serializers.CharField(source='organization.name', read_only=True)
 
     def create(self, validated_data):
         order = super().create(validated_data)
@@ -27,7 +29,8 @@ class OrderSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ['id', 'date', 'number', 'partner', 'counterparty', 'organization', 'agreement', 'contract', 'order_orders_detail']
+        fields = ['id', 'date', 'number', 'side_status', 'partner', 'counterparty', 'organization', 'agreement',
+                  'contract', 'order_orders_detail', 'partner_full_name', 'organization_name']
 
 
 class ExchangeNodeSerializer(serializers.ModelSerializer):

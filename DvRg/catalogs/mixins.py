@@ -4,10 +4,10 @@ from rest_framework.settings import api_settings
 from rest_framework import viewsets
 
 
-def my_response(result=None, status=status.HTTP_200_OK, headers=None):
+def my_response(result=None, status=status.HTTP_200_OK, headers=None, errors=None):
     return Response({
         'result': result,
-        'errors': None
+        'errors': errors
     }, status, headers)
 
 

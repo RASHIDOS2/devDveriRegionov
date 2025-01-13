@@ -6,25 +6,33 @@ from django.contrib.auth import get_user_model
 from catalogs.models import CounterParty, Organizations, Agreement, Contract, Products, Characteristics
 from datetime import datetime
 
+
+class SiteOrderStatus(models.TextChoices):
+    CREATE = "CR", 'Создан'
+    WRITE = "WR", 'Записан'
+    PROCESS = 'PR', "Обработан"
+    CLOSE = 'CL', "Закрыт"
+
 class Orders(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateTimeField(verbose_name='Date')
-    number = models.CharField(verbose_name='Номер', max_length=128)
+    date = models.DateTimeField(verbose_name='Date', auto_now_add=True)
+    number = models.CharField(verbose_name='Номер', max_length=128, default='')
 
     partner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, verbose_name='Партнер', default=None,
-                                related_name='partner_order')
+                                related_name='partner_order', blank=True, null=True)
 
     counterparty = models.ForeignKey(CounterParty, on_delete=models.PROTECT, verbose_name='Контрагент', default=None,
-                                     related_name='counterparty_order')
+                                     related_name='counterparty_order', blank=True, null=True)
 
     organization = models.ForeignKey(Organizations, on_delete=models.PROTECT, verbose_name='Организация', default=None,
-                                     related_name='organization_order')
+                                     related_name='organization_order', blank=True, null=True)
 
     agreement = models.ForeignKey(Agreement, on_delete=models.PROTECT, verbose_name='Соглашения', default=None,
                                   related_name='agreement_order', blank=True, null=True)
 
     contract = models.ForeignKey(Contract, on_delete=models.PROTECT, verbose_name='Договор', default=None,
                                  related_name='contract_order', blank=True, null=True)
+    side_status = models.CharField(verbose_name='Статус заказа на сайте', max_length=10, choices=SiteOrderStatus.choices, default=SiteOrderStatus.CREATE)
 
     def __str__(self):
         return f'Заказ клиента №{self.number} от {self.date} - {self.partner}'

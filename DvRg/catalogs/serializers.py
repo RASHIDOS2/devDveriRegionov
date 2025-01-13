@@ -96,3 +96,9 @@ class ProductsGroupTreeSerializer(serializers.Serializer):
                 result = ProductsGroupTreeSerializer(node)
                 nodes.append(result.data)
         return nodes
+
+
+class PriceImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Images
+        fields = ['image']

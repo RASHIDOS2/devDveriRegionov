@@ -3,8 +3,8 @@ from .views import OrderViewSet, ExchangeNodeViewSet, test_task
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register('api/v1/orders', OrderViewSet, basename='orders')
-router.register(r'api/v1/exchange', ExchangeNodeViewSet, basename='exchange')
+router.register('backend/api/v1/orders', OrderViewSet, basename='orders')
+router.register(r'backend/api/v1/exchange', ExchangeNodeViewSet, basename='exchange')
 
 urlpatterns = [
     path('', include(router.urls)),

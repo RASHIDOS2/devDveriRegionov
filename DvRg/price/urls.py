@@ -4,7 +4,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 
-router.register(r'api/v1/price', PriceViewSet, basename='products')
+router.register(r'backend/api/v1/price', PriceViewSet, basename='products')
 
 
 urlpatterns = [
