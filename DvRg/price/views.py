@@ -3,12 +3,13 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from catalogs.models import Products, Characteristics
-from .serializers import PriceSerializer
+from .serializers import PriceSerializer, PriceDetailSerializer
 from .models import Prices
 
 from .permissions import isAdminOrReadOnly
 import django_filters
 from django.db.models import Q
+from rest_framework.views import APIView
 
 
 class PriceFilter(django_filters.FilterSet):
@@ -24,7 +25,7 @@ class PriceFilter(django_filters.FilterSet):
         return queryset.filter(
             Q(product__full_name__contains=value) |
             Q(characteristic__name__contains=value)
-        )
+        ).order_by('pk')
 
 
 class StandartResultSetPagination(PageNumberPagination):
@@ -43,7 +44,7 @@ class StandartResultSetPagination(PageNumberPagination):
 
 
 class PriceViewSet(viewsets.ModelViewSet):
-    queryset = Prices.objects.all()
+    queryset = Prices.objects.all().order_by('pk')
     serializer_class = PriceSerializer
     pagination_classes = [isAdminOrReadOnly]
     pagination_class = StandartResultSetPagination
@@ -81,3 +82,10 @@ class PriceViewSet(viewsets.ModelViewSet):
         except Exception as ex:
             return Response(data={'error': ex.__str__}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class ProductDetailViewSet(APIView):
+    def get(self, request):
+        id = request.query_params.get('id')
+        queryset = Prices.objects.filter(id=id).get()
+        serializer = PriceDetailSerializer(queryset)
+        return Response({'results': serializer.data, 'errors':''}, status=status.HTTP_200_OK)

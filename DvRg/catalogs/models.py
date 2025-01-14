@@ -97,6 +97,8 @@ class Characteristics(models.Model):
 
     type_of_product = models.ForeignKey(TypesOfProducts, on_delete=models.PROTECT, null=True, blank=True,
                                         verbose_name='Вид номенклатуры', related_name='type_of_product_characteristics')
+    description = models.TextField(verbose_name='Описание', max_length=1000, null=True, blank=True)
+
 
     def __str__(self):
         return f'{self.name} {self.product}/{self.type_of_product}'

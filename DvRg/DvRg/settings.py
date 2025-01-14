@@ -32,6 +32,7 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
+DEV = env.bool('DEV', default=False)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # ALLOWED_HOSTS = ['www.nizamovschool.xyz', 'nizamovschool.xyz', '127.0.0.1', 'localhost']
@@ -94,9 +95,22 @@ WSGI_APPLICATION = 'DvRg.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': env.db('DATABASE_URL', engine=env.str('DB_ENGINE')),
-}
+
+if DEV:
+    DATABASES = {
+        'default': env.db('DATABASE_URL', engine=env.str('DB_ENGINE')),
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': env.str('POSTGRES_DB'),
+            'USER': env.str('POSTGRES_USER'),
+            'PASSWORD': env.str('POSTGRES_PASSWORD'),
+            'HOST': env.str('POSTGRES_HOST'),
+            'PORT': env.str('POSTGRES_PORT'),
+        }
+    }
 # POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 # POSTGRES_USER = os.environ.get("POSTGRES_USER")
 # POSTGRES_DB = os.environ.get("POSTGRES_DB")

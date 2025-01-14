@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отправка пароля</title>
+</head>
+<body>
+{% autoescape off %}
+    <h1>Добро пожаловать в личный кабинет</h1>
+    <p>Ваш логин {{ user.username }}</p>
+    <p>Ваш новый пароль {{ password }}</p>
+    <a href="https://{{ domain }}}/auth/login/"> Войти на сайт</a>
+{% endautoescape %}
+</body>
+</html>

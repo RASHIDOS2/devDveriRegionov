@@ -3,6 +3,11 @@ from django.contrib import admin
 # Register your models here.
 from .models import *
 
+
+class ProductsAdmin(admin.ModelAdmin):
+    search_fields = ['full_name', ]
+
+
 admin.site.register(Products)
 admin.site.register(ProductGroup)
 admin.site.register(Images)

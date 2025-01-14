@@ -17,7 +17,24 @@ class ProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Products
-        fields = ['id', 'full_name', 'group', 'use_characteristics', 'type_of_product']
+        fields = ['id', 'full_name', 'group', 'use_characteristics', 'type_of_product', 'description']
+
+
+class ProductDetailSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(default=uuid.uuid4,)
+    images = serializers.SerializerMethodField(read_only=True)
+    count = serializers.IntegerField(read_only=True, default=0)
+
+    def get_images(self, obj):
+        images = Images.objects.filter(product=obj.id)
+        if images:
+            result = PriceImageSerializer(images, many=True)
+            return result.data
+        return []
+
+    class Meta:
+        model = Products
+        fields = ['id', 'full_name', 'description', 'images', 'count']
 
 
 class CounterPartySerializer(serializers.ModelSerializer):
@@ -48,7 +65,6 @@ class ImagesSerializer(serializers.ModelSerializer):
             if self.instance.image:
                 self.instance.image.delete()
         return super().save(*args, **kwargs)
-
 
 
 class CharacteristicsSerializer(serializers.ModelSerializer):

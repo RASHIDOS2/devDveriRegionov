@@ -16,7 +16,7 @@ class SiteOrderStatus(models.TextChoices):
 class Orders(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date = models.DateTimeField(verbose_name='Date', auto_now_add=True)
-    number = models.CharField(verbose_name='Номер', max_length=128, default='')
+    number = models.CharField(verbose_name='Номер', max_length=128, default='', blank=True, null=True)
 
     partner = models.ForeignKey(get_user_model(), on_delete=models.PROTECT, verbose_name='Партнер', default=None,
                                 related_name='partner_order', blank=True, null=True)
@@ -53,7 +53,7 @@ class Orders(models.Model):
 
 
 class OrderDetails(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.PROTECT, verbose_name='Заказ клиента', default=None,
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, verbose_name='Заказ клиента', default=None,
                               related_name='order_orders_detail')
 
     product = models.ForeignKey(Products, on_delete=models.PROTECT, verbose_name='Номенклатура', default=None,

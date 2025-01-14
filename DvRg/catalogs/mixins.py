@@ -2,6 +2,7 @@ from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework import viewsets
+from rest_framework.permissions import BasePermission
 
 
 def my_response(result=None, status=status.HTTP_200_OK, headers=None, errors=None):
@@ -80,5 +81,16 @@ class DestroyModelMixin:
         instance.delete()
 
 
+class IsOwnerOrAdminUser(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in ['POST', 'GET', 'DELETE']:
+            return request.user and request.user.is_staff
+        elif request.method in ['GET']:
+            return request.user and request.user.is_authenticated
+        else:
+            return True
+
+
 class MyModelViewSet(ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [IsOwnerOrAdminUser]
+

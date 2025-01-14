@@ -38,18 +38,33 @@ class OrganizationViewSet(MyModelViewSet):
 
 
 class CounterPartyViewSet(MyModelViewSet):
-    queryset = CounterParty.objects.all()
     serializer_class = CounterPartySerializer
+
+    def get_queryset(self):
+        if self.request.user and self.request.user.is_staff:
+            return CounterParty.objects.all()
+        elif self.request.user:
+            return CounterParty.objects.filter(partner=self.request.user)
 
 
 class AgreementViewSet(MyModelViewSet):
-    queryset = Agreement.objects.all()
     serializer_class = AgreementSerializer
+
+    def get_queryset(self):
+        if self.request.user and self.request.user.is_staff:
+            return Agreement.objects.all()
+        elif self.request.user:
+            return Agrement.objects.filter(partner=self.request.user)
 
 
 class ContractViewSet(MyModelViewSet):
-    queryset = Contract.objects.all()
     serializer_class = ContractSerializer
+
+    def get_queryset(self):
+        if self.request.user and self.request.user.is_staff:
+            return Contract.objects.all()
+        elif self.requst.user:
+            return Contract.objects.filter(partner=self.requst.user)
 
 
 class Node(object):
@@ -62,6 +77,20 @@ class Node(object):
 
 def add_nodes(product_groups):
     tree_nodes = {}
+    for group in product_groups:
+        node = Node(group)
+        tree_nodes[node.id] = node
+
+    for key, item in tree_nodes.items():
+        if item.parent is None:
+            continue
+        if item.paren_id in tree_nodes.keys():
+            children = tree_nodes[item.parent_id].children
+            children.append(item)
+
+    return tree_nodes
+
+
     for i in (1, 2):
         for group in product_groups:
             node = Node(group)

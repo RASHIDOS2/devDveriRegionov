@@ -1,7 +1,8 @@
+from rest_framework.views import APIView
 from .serializers import OrderSerializer, ExchangeNodeSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import viewsets, status
-from .models import Orders, ExchangeNode, SiteOrderStatus
+from .models import Orders, ExchangeNode, SiteOrderStatus, OrderDetails
 from catalogs.mixins import MyModelViewSet
 from .tasks import upload_orders
 from django.http import HttpResponse
@@ -37,10 +38,6 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Orders.objects.filter(partner=self.request.user).order_by('-date')
 
     def create(self, request, *args, **kwargs):
-        new_order = Orders.objects.filter(partner=self.request.user, site_status=SideOrderStatus.CREATE)
-        if new_order:
-            return my_response(errors='В базе есть созданный необработанный заказ', status=status.HTTP_400_BAD_REQUEST)
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -51,6 +48,8 @@ class OrderViewSet(viewsets.ModelViewSet):
         partner = self.request.data.get('partner', None)
         if partner is None:
             serializer.save(partner=self.request.user)
+        else:
+            serializer.save()
 
 
 class ExchangeNodeViewSet(MyModelViewSet, viewsets.ModelViewSet):
@@ -63,3 +62,27 @@ def test_task(request):
     upload_orders.delay()
     return HttpResponse('<h1>Запуск задачи</h1>')
 
+
+class NewOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        order = Orders.objects.create()
+        order.partner = request.user
+        for item in request.data:
+            price_serializer = PriceSerializer(data=item)
+            price_serializer.is_valid(raise_exception=True)
+            data = price_serializer.validated_data
+
+            OrderDetail.objects.create(
+                order=order,
+                product=data['product'],
+                characteristic=data['characteristic'],
+                price=data['price'],
+                quntity=data['count'],
+                total=data['count'] * data['price']
+            )
+
+        serializer = OrderSerializer(order)
+
+        return my_response(serializer.data, status=status.HTTP_201_CREATED)
