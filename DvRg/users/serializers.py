@@ -1,40 +1,32 @@
-from django.contrib.auth import get_user_model
-from rest_framework import serializers
 import uuid
 
-from rest_framework_simplejwt.settings import api_settings
+from rest_framework import serializers
+from django.contrib.auth import get_user_model
+
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.settings import api_settings
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4)
-    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'full_name', 'email', 'password']
+        fields = ['id', 'username', 'full_name', 'email']
 
     def create(self, validated_data):
         user = super().create(validated_data)
-        user.set_password(validated_data['password'])
+        password = user.set_random_password()
         user.save()
-        user.send_wellcome(validated_data['password'])
-        return user
-
-    def update(self, instance, validated_data):
-        user = super().update(instance, validated_data)
-        try:
-            user.set_password(validated_data['password'])
-            user.save()
-        except KeyError:
-            pass
+        user.send_wellcome(password)
         return user
 
 
 class ProfileCustomUserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = get_user_model()
-        fields = ('username', 'full_name')
+        fields = ['username', 'full_name']
 
 
 class TokenObtainLifetimeSerializer(TokenObtainPairSerializer):
@@ -71,3 +63,5 @@ class TokenRefreshLifetimeSerializer(TokenRefreshSerializer):
             data['lifetime'] = int(refresh.access_token.lifetime.total_seconds())
 
         return data
+
+

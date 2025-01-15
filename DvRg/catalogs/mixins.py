@@ -5,14 +5,18 @@ from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 
 
-def my_response(result=None, status=status.HTTP_200_OK, headers=None, errors=None):
+def my_response(results=None, status=status.HTTP_200_OK, headers=None, errors=None):
     return Response({
-        'result': result,
+        'results': results,
         'errors': errors
     }, status, headers)
 
 
 class CreateModelMixin:
+    """
+    Create a model instance.
+    """
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -31,8 +35,13 @@ class CreateModelMixin:
 
 
 class ListModelMixin:
+    """
+    List a queryset.
+    """
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -43,6 +52,10 @@ class ListModelMixin:
 
 
 class RetrieveModelMixin:
+    """
+    Retrieve a model instance.
+    """
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -50,6 +63,10 @@ class RetrieveModelMixin:
 
 
 class UpdateModelMixin:
+    """
+    Update a model instance.
+    """
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -57,8 +74,10 @@ class UpdateModelMixin:
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        if getter(instance, '_prefetched_objects_cache', None):
-            instance._prefetched_objects_cache = None
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
 
         return my_response(serializer.data)
 
@@ -71,6 +90,9 @@ class UpdateModelMixin:
 
 
 class DestroyModelMixin:
+    """
+    Destroy a model instance.
+    """
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -83,14 +105,16 @@ class DestroyModelMixin:
 
 class IsOwnerOrAdminUser(BasePermission):
     def has_permission(self, request, view):
-        if request.method in ['POST', 'GET', 'DELETE']:
+        if request.method in ['POST, ''PUT', 'DELETE']:
+            # Разрешем обновлять и удалять свои запись только администратору
             return request.user and request.user.is_staff
         elif request.method in ['GET']:
+            # Получать список могут только пользователи прошедшие аутентификацию
             return request.user and request.user.is_authenticated
         else:
             return True
 
 
-class MyModelViewSet(ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, viewsets.ModelViewSet):
+class MyModelViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin,
+                     viewsets.ModelViewSet):
     permission_classes = [IsOwnerOrAdminUser]
-

@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import *
-from catalogs.serializers import PriceImageSerializer
+from .models import Prices
+from catalogs.serializers import PriceImagesSerializer
 from catalogs.models import Images
 
 
-class PriceSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(source='product.full_name')
+class PricesSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='product.full_name', read_only=True)
     title_characteristic = serializers.CharField(source='characteristic.name', read_only=True)
     count = serializers.IntegerField(default=0)
     images = serializers.SerializerMethodField(read_only=True)
@@ -13,13 +13,13 @@ class PriceSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         images = Images.objects.filter(product=obj.product)
         if images:
-            result = PriceImageSerializer(images, many=True)
+            result = PriceImagesSerializer(images, many=True)
             return result.data
         return []
 
     class Meta:
         model = Prices
-        fields = ['id', 'product', 'characteristic', 'title', 'price', 'title_characteristic']
+        fields = ['id', 'product', 'characteristic', 'title', 'title_characteristic', 'price', 'count', 'images']
 
 
 class PriceDetailSerializer(serializers.ModelSerializer):
@@ -32,10 +32,10 @@ class PriceDetailSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         images = Images.objects.filter(product=obj.product)
         if images:
-            result = PriceImageSerializer(images, many=True)
+            result = PriceImagesSerializer(images, many=True)
             return result.data
         return []
 
     class Meta:
         model = Prices
-        fields = ['id', 'product', 'characteristic', 'title', 'price', 'title_characteristic', 'count', 'images', 'description']
+        fields = ['id', 'product', 'characteristic', 'title', 'title_characteristic', 'price', 'count', 'images', 'description']

@@ -3,13 +3,28 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from catalogs.models import Products, Characteristics
-from .serializers import PriceSerializer, PriceDetailSerializer
+from .permissions import IsAdminOrReadOnly
+from .serializers import PricesSerializer, PriceDetailSerializer
 from .models import Prices
 
-from .permissions import isAdminOrReadOnly
 import django_filters
 from django.db.models import Q
 from rest_framework.views import APIView
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 10
+
+    def get_paginated_response(self, data):
+        return Response({
+            'count': self.page.paginator.count,
+            'num_pages': self.page.paginator.num_pages,
+            'current_page': self.page.number,
+            'per_page': self.page.paginator.per_page,
+            'results': data,
+        })
 
 
 class PriceFilter(django_filters.FilterSet):
@@ -28,26 +43,11 @@ class PriceFilter(django_filters.FilterSet):
         ).order_by('pk')
 
 
-class StandartResultSetPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 10
-
-    def get_paginated_response(self, data):
-        return Response({
-            'count': self.page.paginator.count,
-            'num_pages': self.page.paginator.num_pages,
-            'current_page': self.page.number,
-            'per_page': self.page.paginator.per_page,
-            'result': data
-        })
-
-
-class PriceViewSet(viewsets.ModelViewSet):
+class PricesViewSet(viewsets.ModelViewSet):
     queryset = Prices.objects.all().order_by('pk')
-    serializer_class = PriceSerializer
-    pagination_classes = [isAdminOrReadOnly]
-    pagination_class = StandartResultSetPagination
+    serializer_class = PricesSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = StandardResultsSetPagination
     filterset_class = PriceFilter
 
     def create(self, request, *args, **kwargs):
@@ -80,7 +80,7 @@ class PriceViewSet(viewsets.ModelViewSet):
                     obj.save()
                     return Response(status=status.HTTP_201_CREATED)
         except Exception as ex:
-            return Response(data={'error': ex.__str__}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"error": ex.__str__}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductDetailViewSet(APIView):
@@ -88,4 +88,4 @@ class ProductDetailViewSet(APIView):
         id = request.query_params.get('id')
         queryset = Prices.objects.filter(id=id).get()
         serializer = PriceDetailSerializer(queryset)
-        return Response({'results': serializer.data, 'errors':''}, status=status.HTTP_200_OK)
+        return Response({'results': serializer.data, 'errors': ''}, status=status.HTTP_200_OK)

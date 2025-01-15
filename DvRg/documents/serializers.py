@@ -1,14 +1,12 @@
-from rest_framework import serializers
-from .models import *
-from drf_writable_nested import WritableNestedModelSerializer
-
 import uuid
-
-from catalogs.serializers import PriceImageSerializer
+from rest_framework import serializers
+from .models import Orders, OrdersDetail, ExchangeNode
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+from catalogs.serializers import PriceImagesSerializer
 from catalogs.models import Images
 
 
-class OrderDetailSerializer(serializers.ModelSerializer):
+class OrdersDetailSerializer(serializers.ModelSerializer):
     product_full_name = serializers.CharField(source='product.full_name', read_only=True)
     characteristic_name = serializers.CharField(source='characteristic.name', read_only=True)
     images = serializers.SerializerMethodField(read_only=True)
@@ -17,18 +15,18 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     def get_images(self, obj):
         images = Images.objects.filter(product=obj.product)
         if images:
-            result = PriceImageSerializer(images, many=True)
+            result = PriceImagesSerializer(images, many=True)
             return result.data
         return []
 
     class Meta:
-        model = OrderDetails
-        fields = ['pk', 'order', 'product', 'product_full_name', 'characteristic', 'characteristic_name', 'price', 'quantity', 'total', 'image']
+        model = OrdersDetail
+        fields = ['pk', 'order', 'product', 'product_full_name', 'characteristic', 'characteristic_name', 'price', 'quantity', 'total', 'images']
 
 
-class OrderSerializer(WritableNestedModelSerializer):
-    id = serializers.UUIDField(default=uuid.uuid4,)
-    order_orders_detail = OrderDetailSerializer(many=True, required=False)
+class OrdersSerializer(WritableNestedModelSerializer):
+    id = serializers.UUIDField(default=uuid.uuid4)
+    order_orders_detail = OrdersDetailSerializer(many=True, required=False)
     partner_full_name = serializers.CharField(source='partner.full_name', read_only=True)
     organization_name = serializers.CharField(source='organization.name', read_only=True)
 
@@ -46,16 +44,13 @@ class OrderSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Orders
-        fields = ['id', 'date', 'number', 'side_status', 'partner', 'counterparty', 'organization', 'agreement',
-                  'contract', 'order_orders_detail', 'partner_full_name', 'organization_name']
+        fields = ['id', 'date', 'number', 'site_status', 'partner', 'partner_full_name', 'counterparty', 'organization',
+                  'organization_name', 'agreement', 'contract', 'order_orders_detail']
 
 
 class ExchangeNodeSerializer(serializers.ModelSerializer):
-    model = OrderSerializer
+    order = OrdersSerializer()
 
     class Meta:
         model = ExchangeNode
         fields = ['pk', 'updated_at', 'order']
-
-
-

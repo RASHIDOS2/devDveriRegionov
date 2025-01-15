@@ -3,11 +3,9 @@ from .views import *
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-
-router.register(r'backend/api/v1/price', PriceViewSet, basename='products')
-
+router.register(r'backend/api/v1/prices', PricesViewSet, basename='prices')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('backend/api/v1/price_detail', ProductDetailViewSet.as_view(), name='price_detail')
+    path('backend/api/v1/price_detail/', ProductDetailViewSet.as_view(), name='price_detail')
 ]
