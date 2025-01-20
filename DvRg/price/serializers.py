@@ -38,4 +38,5 @@ class PriceDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Prices
-        fields = ['id', 'product', 'characteristic', 'title', 'title_characteristic', 'price', 'count', 'images', 'description']
+        fields = ['id', 'product', 'characteristic', 'title', 'title_characteristic', 'price',
+                  'count', 'images', 'description']
