@@ -9,7 +9,6 @@ from rest_framework_simplejwt.settings import api_settings
 
 class CustomUserSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(default=uuid.uuid4)
-
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'full_name', 'email']
@@ -18,7 +17,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user = super().create(validated_data)
         password = user.set_random_password()
         user.save()
-        user.send_wellcome(password)
+        # user.send_wellcome(password)
         return user
 
 

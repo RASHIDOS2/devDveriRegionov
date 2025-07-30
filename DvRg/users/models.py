@@ -5,6 +5,18 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
+from django.utils.crypto import get_random_string
+
+PASSWORD_CHARS = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+
+def make_random_password(length=10, allowed_chars=PASSWORD_CHARS):
+    """
+    Generate a random password with the given length and given
+    allowed_chars. The default value of allowed_chars does not have "I" or
+    "O" or letters and digits that look similar -- just to avoid confusion.
+    """
+    return get_random_string(length, allowed_chars)
 
 
 class CustomUser(AbstractUser):
@@ -12,7 +24,7 @@ class CustomUser(AbstractUser):
     full_name = models.CharField(verbose_name="Наименование полное", max_length=250)
 
     def set_random_password(self):
-        password = BaseUserManager.make_random_password(8)
+        password = make_random_password()
         self.set_password(password)
         self.save()
         return password
